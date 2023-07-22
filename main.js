@@ -62,98 +62,124 @@ class Glass {
     this.glassImg = document.querySelector('#glass')
     this.cx = canvasWidth * 0.5
     this.cy = canvasHeight * 0.8
+    this.control = {
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      clockwise: false,
+      counterClockwise: false,
+    }
 
-    this.left = Bodies.rectangle(this.cx - 60, this.cy, thickness, 150, {
+
+    let left = Bodies.rectangle(this.cx - 60, this.cy, thickness, 150, {
       chamfer: {radius: 10},
-      isStatic: true,
       angle: Math.PI / 180 * -15,
-      render: {fillStyle: wallColor}
+      // render: {fillStyle: wallColor}
     })
-    this.right = Bodies.rectangle(this.cx + 37, this.cy, thickness, 150, {
+    let right = Bodies.rectangle(this.cx + 37, this.cy, thickness, 150, {
       chamfer: {radius: 10},
-      isStatic: true,
       angle: Math.PI / 180 * 15,
-      render: {fillStyle: wallColor}
+      // render: {fillStyle: wallColor}
     })
-    this.bottom = Bodies.rectangle(this.cx - 10, this.cy + 72, 85, thickness * 2, {
+    let bottom = Bodies.rectangle(this.cx - 10, this.cy + 72, 85, thickness * 2, {
       chamfer: {radius: 20},
-      isStatic: true,
-      render: {fillStyle: wallColor}
+      // render: {fillStyle: wallColor}
     })
     this.glassImg.style.transform = `translate(${this.cx - canvasWidth / 2}px, ${this.cy - canvasHeight / 2}px)`
 
-    Composite.add(engine.world, [this.left, this.right, this.bottom])
+    this.left = left
+    this.glass = Body.create({
+      parts: [left, right, bottom],
+      isStatic: true
+    })
+
+    Composite.add(engine.world, [this.glass])
   }
 
   setPosition = pos => {
-    console.log(this.left);
-    this.cx = pos.x
-    this.cy = pos.y
-    Body.setPosition(this.left, {x: this.cx - 60, y: this.cy})
-    Body.setPosition(this.right, {x: this.cx + 37, y: this.cy})
-    Body.setPosition(this.bottom, {x: this.cx - 10, y: this.cy + 72})
-    this.glassImg.style.transform = `translate(${this.cx - canvasWidth / 2}px, ${this.cy - canvasHeight / 2}px)`
+    Body.setPosition(glass.glass, {x: pos.x, y: pos.y});
+
+    console.log(`translate(${pos.x + 11 - canvasWidth / 2}px, ${pos.y - 25 - canvasHeight / 2}px)`)
+
+    this.glassImg.style.transform = `translate(${pos.x + 11 - canvasWidth / 2}px, ${pos.y - 25 - canvasHeight / 2}px)`
   }
 
+  setAngle = angle => {
+    Body.setAngle(this.glass, angle)
+    console.log(`rotate(${angle}deg)`)
+    const current_pos = this.getPosition()
+    // TODO: the glass is not rotating exactly with the body, use another image maybe
+    this.glassImg.style.transform =
+      `translate(${current_pos.x + 11 - canvasWidth / 2}px, ${current_pos.y - 25 - canvasHeight / 2}px) ` +
+      `rotate(${Math.floor(180 * angle / Math.PI)}deg)`
+  }
   getPosition = () => {
     return {
-      x: this.left.position.x + 60,
-      y: this.left.position.y
+      x: this.glass.position.x,
+      y: this.glass.position.y
     }
   }
+
+  updatePosition = () => {
+    // FIXME: one direction at a time
+    const current_pos = this.getPosition()
+    const current_angle = this.glass.angle
+    if (this.control.right) {
+      this.setPosition({x: current_pos.x + 5, y: current_pos.y})
+    }
+    if (this.control.left) {
+      this.setPosition({x: current_pos.x - 5, y: current_pos.y});
+    }
+    if (this.control.up) {
+      this.setPosition({x: current_pos.x, y: current_pos.y - 5});
+    }
+    if (this.control.down) {
+      this.setPosition({x: current_pos.x, y: current_pos.y + 5});
+    }
+    if (this.control.clockwise) {
+      this.setAngle(current_angle + 0.02)
+    }
+    if (this.control.counterClockwise) {
+      this.setAngle(current_angle - 0.02)
+    }
+  };
 }
 
 init()
 resizeFilter()
 glass = new Glass()
 
-const controller = {
-  left: false,
-  right: false,
-  up: false,
-  down: false
-}
 document.addEventListener('keydown', event => {
-  const currentPos = glass.getPosition()
-  if (event.key === 'ArrowLeft') {
-    controller.left = true;
-    glass.setPosition({x: currentPos.x - 1, y: currentPos.y})
-  } else if (event.key === 'ArrowRight') {
-    controller.right = true;
-    const currentPos = glass.getPosition()
-    glass.setPosition({x: currentPos.x + 1, y: currentPos.y})
-  } else if (event.key === 'ArrowUp') {
-    controller.right = true;
-    const currentPos = glass.getPosition()
-    glass.setPosition({x: currentPos.x, y: currentPos.y - 1})
-  } else if (event.key === 'ArrowDown') {
-    controller.right = true;
-    const currentPos = glass.getPosition()
-    glass.setPosition({x: currentPos.x, y: currentPos.y + 1})
-  }
-
-  // check for up/down keys...
+  if (event.key === 'ArrowLeft')
+    glass.control.left = true;
+  if (event.key === 'ArrowRight')
+    glass.control.right = true;
+  if (event.key === 'ArrowUp')
+    glass.control.up = true;
+  if (event.key === 'ArrowDown')
+    glass.control.down = true;
+  if (event.key === 'q')
+    glass.control.counterClockwise = true;
+  if (event.key === 'e')
+    glass.control.clockwise = true;
 });
 
 document.addEventListener('keyup', event => {
-  if (event.key === 'ArrowLeft') {
-    controller.left = false;
-  } else if (event.key === 'ArrowRight') {
-    controller.right = false;
-  }
+  if (event.key === 'ArrowLeft')
+    glass.control.left = false;
+  if (event.key === 'ArrowRight')
+    glass.control.right = false;
+  if (event.key === 'ArrowUp')
+    glass.control.up = false;
+  if (event.key === 'ArrowDown')
+    glass.control.down = false;
+  if (event.key === 'q')
+    glass.control.counterClockwise = false;
+  if (event.key === 'e')
+    glass.control.clockwise = false;
+})
 
-  // check for up/down keys
-});
-
-// Inside engine update loop
-if (controller.right) {
-  // Body.applyForce(body, {x: 0.001, y: 0});
-}
-
-if (controller.left) {
-  const currentPos = glass.getPosition()
-  // Body.applyForce(body, {x: -0.001, y: 0});
-}
 
 // Check for up and down
 Events.on(runner, 'tick', e => {
@@ -164,6 +190,8 @@ Events.on(runner, 'tick', e => {
       circles.splice(i, 1)
     }
   }
+
+  glass.updatePosition()
 })
 
 function resizeFilter() {
