@@ -39,20 +39,22 @@ function init() {
   Runner.run(runner, engine)
 }
 
-function createLiquid() {
-  const x = 105
-  const y = 105
+
+function createLiquid(pos, num, color = '#fff') {
+
   const radius = randomNumBetween(6, 7)
-  const body = Bodies.circle(x, y, radius, {
-    friction: 0,
-    density: 1,
-    frictionAir: 0,
-    restitution: 0.7,
-    render: {fillStyle: '#fff'}
-  })
-  Body.applyForce(body, body.position, {x: 1, y: 0})
-  Composite.add(engine.world, body)
-  circles.push(body)
+  for (let i = 0; i < num; ++i) {
+    const body = Bodies.circle(pos.x, pos.y, radius, {
+      friction: 0,
+      density: 1,
+      frictionAir: 0,
+      restitution: 0.7,
+      render: {fillStyle: color}
+    })
+    Body.applyForce(body, body.position, {x: 1, y: 0})
+    Composite.add(engine.world, body)
+    circles.push(body)
+  }
 }
 
 class Glass {
@@ -71,20 +73,19 @@ class Glass {
       counterClockwise: false,
     }
 
-
     let left = Bodies.rectangle(this.cx - 60, this.cy, thickness, 150, {
       chamfer: {radius: 10},
       angle: Math.PI / 180 * -15,
-      // render: {fillStyle: wallColor}
+      render: {fillStyle: wallColor}
     })
     let right = Bodies.rectangle(this.cx + 37, this.cy, thickness, 150, {
       chamfer: {radius: 10},
       angle: Math.PI / 180 * 15,
-      // render: {fillStyle: wallColor}
+      render: {fillStyle: wallColor}
     })
     let bottom = Bodies.rectangle(this.cx - 10, this.cy + 72, 85, thickness * 2, {
       chamfer: {radius: 20},
-      // render: {fillStyle: wallColor}
+      render: {fillStyle: wallColor}
     })
     this.glassImg.style.transform = `translate(${this.cx - canvasWidth / 2}px, ${this.cy - canvasHeight / 2}px)`
 
@@ -100,9 +101,11 @@ class Glass {
   setPosition = pos => {
     Body.setPosition(glass.glass, {x: pos.x, y: pos.y});
 
-    console.log(`translate(${pos.x + 11 - canvasWidth / 2}px, ${pos.y - 25 - canvasHeight / 2}px)`)
+    const current_angle = this.glass.angle
 
-    this.glassImg.style.transform = `translate(${pos.x + 11 - canvasWidth / 2}px, ${pos.y - 25 - canvasHeight / 2}px)`
+    this.glassImg.style.transform =
+      `translate(${pos.x + 11 - canvasWidth / 2}px, ${pos.y - 25 - canvasHeight / 2}px)` +
+      `rotate(${Math.floor(180 * current_angle / Math.PI)}deg)`
   }
 
   setAngle = angle => {
@@ -146,9 +149,14 @@ class Glass {
   };
 }
 
+const x = canvasWidth * 0.5
+const y = canvasHeight * 0.8
+const initial_pos = {x: x, y: y}
+
 init()
 resizeFilter()
 glass = new Glass()
+createLiquid(initial_pos, 100)
 
 document.addEventListener('keydown', event => {
   if (event.key === 'ArrowLeft')
@@ -183,7 +191,6 @@ document.addEventListener('keyup', event => {
 
 // Check for up and down
 Events.on(runner, 'tick', e => {
-  createLiquid()
   for (let i = circles.length - 1; i >= 0; i--) {
     if (circles[i].position.y - circles[i].circleRadius > canvasHeight) {
       Composite.remove(engine.world, circles[i])
