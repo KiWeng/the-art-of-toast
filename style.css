@@ -28,12 +28,12 @@ header {
   flex-shrink: 0;
 }
 
-#carton, #glass {
+#carton, .glass {
   position: absolute;
   pointer-events: none;
 }
 
-#glass {
+.glass {
   width: 250px;
 }
 
