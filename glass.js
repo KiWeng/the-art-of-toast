@@ -3,6 +3,7 @@ import {Bodies, Body, Composite} from 'matter-js'
 
 let canvasWidth = innerWidth
 let canvasHeight = innerHeight
+
 export class Glass {
   constructor(pos, engine, img) {
     const thickness = 25
@@ -19,24 +20,35 @@ export class Glass {
       counterClockwise: false,
     }
 
+    const radians = Math.PI / 180 * 15
+    this.leftTip = Bodies.circle(
+      this.cx - 60 - Math.sin(radians) * 150 / 2,
+      this.cy - Math.cos(radians) * 150 / 2,
+      1
+    )
+    this.rightTip = Bodies.circle(
+      this.cx + 37 + Math.sin(radians) * 150 / 2,
+      this.cy - Math.cos(radians) * 150 / 2,
+      1
+    )
     let left = Bodies.rectangle(this.cx - 60, this.cy, thickness, 150, {
       chamfer: {radius: 10},
-      angle: Math.PI / 180 * -15,
-      // render: {fillStyle: wallColor}
+      angle: -radians,
+      render: {fillStyle: wallColor}
     })
     let right = Bodies.rectangle(this.cx + 37, this.cy, thickness, 150, {
       chamfer: {radius: 10},
-      angle: Math.PI / 180 * 15,
-      // render: {fillStyle: wallColor}
+      angle: radians,
+      render: {fillStyle: wallColor}
     })
     let bottom = Bodies.rectangle(this.cx - 10, this.cy + 72, 85, thickness * 2, {
       chamfer: {radius: 20},
-      // render: {fillStyle: wallColor}
+      render: {fillStyle: wallColor}
     })
     this.glassImg.style.transform = `translate(${this.cx - canvasWidth / 2}px, ${this.cy - canvasHeight / 2}px)`
 
     this.glass = Body.create({
-      parts: [left, right, bottom],
+      parts: [left, right, bottom, this.leftTip, this.rightTip],
       isStatic: true
     })
 
@@ -55,7 +67,6 @@ export class Glass {
 
   setAngle = angle => {
     Body.setAngle(this.glass, angle)
-    console.log(`rotate(${angle}deg)`)
     const current_pos = this.getPosition()
     // TODO: the glass is not rotating exactly with the body, use another image maybe
     this.glassImg.style.transform =
@@ -69,21 +80,23 @@ export class Glass {
     }
   }
 
+  getLowestCupLipPoint = () => Math.max(this.leftTip.position.y, this.rightTip.position.y)
+
   updatePosition = () => {
     // FIXME: one direction at a time
-    const current_pos = this.getPosition()
+    let new_pos = this.getPosition()
     const current_angle = this.glass.angle
     if (this.control.right) {
-      this.setPosition({x: current_pos.x + 5, y: current_pos.y})
+      new_pos.x = new_pos.x + 5
     }
     if (this.control.left) {
-      this.setPosition({x: current_pos.x - 5, y: current_pos.y});
+      new_pos.x = new_pos.x - 5
     }
     if (this.control.up) {
-      this.setPosition({x: current_pos.x, y: current_pos.y - 5});
+      new_pos.y = new_pos.y - 5
     }
     if (this.control.down) {
-      this.setPosition({x: current_pos.x, y: current_pos.y + 5});
+      new_pos.y = new_pos.y + 5
     }
     if (this.control.clockwise) {
       this.setAngle(current_angle + 0.02)
@@ -91,5 +104,10 @@ export class Glass {
     if (this.control.counterClockwise) {
       this.setAngle(current_angle - 0.02)
     }
+
+    this.setPosition({
+      x: Math.min(Math.max(new_pos.x, 0), canvasWidth),
+      y: Math.min(Math.max(new_pos.y, 0), canvasHeight - 20)
+    })
   };
 }
