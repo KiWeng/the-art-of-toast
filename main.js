@@ -1,5 +1,6 @@
-import {Bodies, Body, Composite, Engine, Events, Mouse, Render, Runner} from 'matter-js'
+import {Bodies, Body, Bounds, Composite, Engine, Events, Mouse, Render, Runner} from 'matter-js'
 import {Glass} from './glass.js'
+import {bindKey} from '@rwh/keystrokes'
 
 const canvas = document.querySelector('#matter-canvas')
 let canvasWidth = innerWidth
@@ -69,69 +70,57 @@ glass1 = new Glass(initial_pos1, engine, document.querySelector('#glass1'))
 createLiquid(initial_pos0, 100)
 createLiquid(initial_pos1, 100)
 
-document.addEventListener('keydown', event => {
-  if (event.key === 'a')
-    glass0.control.left = true;
-  if (event.key === 'd')
-    glass0.control.right = true;
-  if (event.key === 'w')
-    glass0.control.up = true;
-  if (event.key === 's')
-    glass0.control.down = true;
-  if (event.key === 'q')
-    glass0.control.counterClockwise = true;
-  if (event.key === 'e')
-    glass0.control.clockwise = true;
-});
 
-
-document.addEventListener('keydown', event => {
-  if (event.key === 'ArrowLeft')
-    glass1.control.left = true;
-  if (event.key === 'ArrowRight')
-    glass1.control.right = true;
-  if (event.key === 'ArrowUp')
-    glass1.control.up = true;
-  if (event.key === 'ArrowDown')
-    glass1.control.down = true;
-  // if (event.key === 'ArrowLeft')
-  //   glass1.control.counterClockwise = true;
-  // if (event.key === 'ArrowLeft')
-  //   glass1.control.clockwise = true;
-});
-
-
-document.addEventListener('keyup', event => {
-  if (event.key === 'ArrowLeft')
-    glass0.control.left = false;
-  if (event.key === 'ArrowRight')
-    glass0.control.right = false;
-  if (event.key === 'ArrowUp')
-    glass0.control.up = false;
-  if (event.key === 'ArrowDown')
-    glass0.control.down = false;
-  // if (event.key === 'Arrowleft')
-  //   glass0.control.counterClockwise = false;
-  // if (event.key === 'Arrowleft')
-  //   glass0.control.clockwise = false;
+bindKey('a', {
+  onPressed: () => glass0.control.left = true,
+  onReleased: () => glass0.control.left = false
+})
+bindKey('d', {
+  onPressed: () => glass0.control.right = true,
+  onReleased: () => glass0.control.right = false
+})
+bindKey('w', {
+  onPressed: () => glass0.control.up = true,
+  onReleased: () => glass0.control.up = false
+})
+bindKey('s', {
+  onPressed: () => glass0.control.down = true,
+  onReleased: () => glass0.control.down = false
+})
+bindKey('q', {
+  onPressed: () => glass0.control.counterClockwise = true,
+  onReleased: () => glass0.control.counterClockwise = false
+})
+bindKey('e', {
+  onPressed: () => glass0.control.clockwise = true,
+  onReleased: () => glass0.control.clockwise = false
 })
 
 
-document.addEventListener('keyup', event => {
-  if (event.key === 'a')
-    glass1.control.left = false;
-  if (event.key === 'd')
-    glass1.control.right = false;
-  if (event.key === 'w')
-    glass1.control.up = false;
-  if (event.key === 's')
-    glass1.control.down = false;
-  if (event.key === 'q')
-    glass1.control.counterClockwise = false;
-  if (event.key === 'e')
-    glass1.control.clockwise = false;
-});
-
+bindKey('k', {
+  onPressed: () => glass1.control.left = true,
+  onReleased: () => glass1.control.left = false
+})
+bindKey(';', {
+  onPressed: () => glass1.control.right = true,
+  onReleased: () => glass1.control.right = false
+})
+bindKey('o', {
+  onPressed: () => glass1.control.up = true,
+  onReleased: () => glass1.control.up = false
+})
+bindKey('l', {
+  onPressed: () => glass1.control.down = true,
+  onReleased: () => glass1.control.down = false
+})
+bindKey('i', {
+  onPressed: () => glass1.control.counterClockwise = true,
+  onReleased: () => glass1.control.counterClockwise = false
+})
+bindKey('p', {
+  onPressed: () => glass1.control.clockwise = true,
+  onReleased: () => glass1.control.clockwise = false
+})
 
 // Check for up and down
 Events.on(runner, 'tick', e => {
@@ -140,6 +129,21 @@ Events.on(runner, 'tick', e => {
       Composite.remove(engine.world, circles[i])
       circles.splice(i, 1)
     }
+  }
+
+  if (Bounds.overlaps(glass0.glass.bounds, glass1.glass.bounds)) {
+    let endGameTitle = document.getElementById('endgame')
+    let background = document.getElementById('background')
+
+    if (glass0.getLowestCupLipPoint() > glass1.getLowestCupLipPoint()) {
+      endGameTitle.innerText = "Left"
+    } else {
+      endGameTitle.innerText = "Right"
+    }
+
+    endGameTitle.style.animation = "fadeIn 0.5s"
+    background.style.animation = "fadeIn 0.5s"
+    background.style.display = "flex"
   }
 
   glass0.updatePosition()

@@ -112,6 +112,11 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.18.15.tgz#41ee66253566124cc44bce1b4c760a87d9f5bf1d"
   integrity sha512-imUxH9a3WJARyAvrG7srLyiK73XdX83NXQkjKvQ+7vPh3ZxoLrzvPkQKKw2DwZ+RV2ZB6vBfNHP8XScAmQC3aA==
 
+"@rwh/keystrokes@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@rwh/keystrokes/-/keystrokes-1.0.0.tgz#589cb00326f33521d5146c36b5f64c45f83c74cf"
+  integrity sha512-p1++h97UkGs/db0QuaXP0gVu8+/lIEScGXEUWgmcxW5J6xcgLA+xn/RLjg0yL32SA9p5D7TqfKViFDPVLbXA7w==
+
 esbuild@^0.18.10:
   version "0.18.15"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.18.15.tgz#5b5c1a22e608afd5675f82ad466c4d2cfd723f85"
