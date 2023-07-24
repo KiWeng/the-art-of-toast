@@ -6,7 +6,6 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link rel="stylesheet" href="./style.css">
-
 </head>
 <body>
 <!-- partial:index.partial.html -->
@@ -20,8 +19,10 @@
     </filter>
   </defs>
 </svg>
-
-<h1 id="endgame"></h1>
+<div id="foreground">
+  <h1 id="endgame"></h1>
+  <button id="restartBtn" class="button" onClick="window.location.reload();">重新开始</button>
+</div>
 <div id="background"></div>
 
 <img id="glass0" class="glass"

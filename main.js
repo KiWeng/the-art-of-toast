@@ -1,6 +1,6 @@
 import {Bodies, Body, Bounds, Composite, Engine, Events, Mouse, Render, Runner} from 'matter-js'
 import {Glass} from './glass.js'
-import {bindKey} from '@rwh/keystrokes'
+import {bindKey, unbindKey} from '@rwh/keystrokes'
 
 const canvas = document.querySelector('#matter-canvas')
 let canvasWidth = innerWidth
@@ -133,7 +133,26 @@ Events.on(runner, 'tick', e => {
 
   if (Bounds.overlaps(glass0.glass.bounds, glass1.glass.bounds)) {
     let endGameTitle = document.getElementById('endgame')
+    let foreground = document.getElementById('foreground')
     let background = document.getElementById('background')
+
+    const boundKeys = 'qweasdiopkl;'
+    for (let ch of boundKeys) {
+      unbindKey(ch)
+    }
+
+    glass0.control.clockwise = false
+    glass0.control.counterClockwise = false
+    glass0.control.left = false
+    glass0.control.right = false
+    glass0.control.down = false
+    glass0.control.up = false
+    glass0.control.clockwise = false
+    glass1.control.counterClockwise = false
+    glass1.control.left = false
+    glass1.control.right = false
+    glass1.control.down = false
+    glass1.control.up = false
 
     if (glass0.getLowestCupLipPoint() > glass1.getLowestCupLipPoint()) {
       endGameTitle.innerText = "Left"
@@ -141,9 +160,10 @@ Events.on(runner, 'tick', e => {
       endGameTitle.innerText = "Right"
     }
 
-    endGameTitle.style.animation = "fadeIn 0.5s"
+    foreground.style.animation = "fadeIn 0.5s"
     background.style.animation = "fadeIn 0.5s"
     background.style.display = "flex"
+    foreground.style.display = "flex"
   }
 
   glass0.updatePosition()

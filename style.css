@@ -46,7 +46,8 @@ header {
   transform: translate(-20px, 0);
 }
 
-#endgame {
+#foreground {
+  font-family: sans-serif;
   position: fixed;
   top: 0;
   left: 0;
@@ -56,9 +57,59 @@ header {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  z-index: 2;
+  display: none;
+  line-height: 128px;
+}
+
+
+.button {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #357a38;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.5);
+}
+
+.button--block {
+  display: block;
+  width: 100%;
+}
+
+.button--outline {
+  color: #4caf50;
+  background-color: transparent;
+  border: 2px solid;
+}
+
+.button--outline:hover {
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+#restartBtn {
+  font-size: 32px;
+}
+
+#endgame {
   color: black;
   font-size: 64px;
-  z-index: 2;
 }
 
 #background {
